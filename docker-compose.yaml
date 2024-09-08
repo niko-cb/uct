@@ -1,0 +1,60 @@
+version: "3.8"
+
+services:
+  backend:
+    container_name: backend
+    build:
+      context: backend
+      dockerfile: Dockerfile
+      target: build
+    ports:
+      - "8080:8080"
+    command: air
+    tty: true
+    working_dir: /go/services/invoice
+    volumes:
+      -  ./backend/:/go/services/invoice/
+    environment:
+      - DB_USER=user
+      - DB_PASS=user
+      - DB_NAME=uct
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - JWT_SECRET=some-secret-key
+    networks:
+      - utc-net
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    container_name: uct-mysql
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: uct
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user
+    ports:
+      - "3306:3306"
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql:/var/lib/mysql
+      - ./db:/docker-entrypoint-initdb.d
+    networks:
+      - utc-net
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u$$MYSQL_USER -p$$MYSQL_PASSWORD
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 0s
+
+volumes:
+    mysql:
+      driver: local
+
+networks:
+  utc-net:
+    external: true
+    driver: bridge

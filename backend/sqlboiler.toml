@@ -1,0 +1,14 @@
+# sqlboiler.toml
+output   = "internal/domain/entity/models"
+wipe     = true
+no-tests = true
+add-enum-types = true
+
+[mysql]
+  dbname  = "utc"
+  host    = "localhost"
+  port    = 3306
+  user    = "user"
+  pass    = "user"
+  sslmode = "false"
+  tinyint_as_int = true
