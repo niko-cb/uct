@@ -4,9 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/niko-cb/uct/internal/conversion"
 	"github.com/niko-cb/uct/internal/domain/repository"
 	"github.com/niko-cb/uct/internal/infrastructure/monitor/log"
-	"github.com/volatiletech/sqlboiler/v4/types"
 	"time"
 
 	"github.com/niko-cb/uct/internal/domain/entity"
@@ -31,6 +31,29 @@ func NewInvoiceService(repo repository.InvoiceRepository) InvoiceService {
 
 // EntityToModel converts invoice entity to an invoice model to prepare for database insert
 func (s *invoiceService) EntityToModel(ctx context.Context, invoice *entity.Invoice) (*models.Invoice, error) {
+	pa, err := conversion.ConvertToDecimal(invoice.PaymentAmount)
+	if err != nil {
+		log.Error(ctx, fmt.Errorf(fmt.Sprintf("error converting payment amount: %v", err)))
+		return nil, err
+	}
+
+	fa, err := conversion.ConvertToDecimal(invoice.FeeAmount)
+	if err != nil {
+		log.Error(ctx, fmt.Errorf(fmt.Sprintf("error converting fee amount: %v", err)))
+		return nil, err
+	}
+
+	ta, err := conversion.ConvertToDecimal(invoice.TaxAmount)
+	if err != nil {
+		log.Error(ctx, fmt.Errorf(fmt.Sprintf("error converting tax amount: %v", err)))
+		return nil, err
+	}
+
+	toa, err := conversion.ConvertToDecimal(invoice.TotalAmount)
+	if err != nil {
+		log.Error(ctx, fmt.Errorf(fmt.Sprintf("error converting total amount: %v", err)))
+		return nil, err
+	}
 
 	invoiceM := &models.Invoice{
 		ID:            invoice.ID,
@@ -38,10 +61,10 @@ func (s *invoiceService) EntityToModel(ctx context.Context, invoice *entity.Invo
 		ClientID:      invoice.ClientID,
 		IssueDate:     invoice.IssueDate,
 		DueDate:       invoice.DueDate,
-		PaymentAmount: convertToDecimal(invoice.PaymentAmount),
-		FeeAmount:     convertToDecimal(invoice.FeeAmount),
-		TaxAmount:     convertToDecimal(invoice.TaxAmount),
-		TotalAmount:   convertToDecimal(invoice.TotalAmount),
+		PaymentAmount: pa,
+		FeeAmount:     fa,
+		TaxAmount:     ta,
+		TotalAmount:   toa,
 		Status:        invoice.Status,
 	}
 	return invoiceM, nil
@@ -55,15 +78,4 @@ func (s *invoiceService) CreateInvoice(ctx context.Context, tx *sql.Tx, invoice 
 // GetInvoicesByDateRange retrieves invoices from the database by date range
 func (s *invoiceService) GetInvoicesByDateRange(ctx context.Context, from time.Time, to time.Time) ([]*models.Invoice, error) {
 	return s.repo.GetInvoicesByDateRange(ctx, from, to)
-}
-
-// convertToDecimal converts float64 to types.Decimal to store in the database
-func convertToDecimal(amount float64) types.Decimal {
-	var d types.Decimal
-	err := d.Scan(amount)
-	if err != nil {
-		log.Fatal(context.Background(), fmt.Errorf("failed to convert float64 to decimal: %+v", err))
-	}
-
-	return d
 }
