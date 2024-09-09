@@ -34,7 +34,7 @@ type Invoice struct {
 
 func main() {
 	// Database connection setup
-	db, err := sql.Open("mysql", "user:user@tcp(localhost:3306)/utc?parseTime=true")
+	db, err := sql.Open("mysql", "user:user@tcp(localhost:3306)/uct?parseTime=true")
 	if err != nil {
 		log.Fatal(err)
 	}

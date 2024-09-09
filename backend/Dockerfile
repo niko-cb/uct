@@ -1,9 +1,9 @@
 # ----Build stage----
 FROM golang:1.23.0-alpine AS build
 
-WORKDIR /go/services/utc
+WORKDIR /go/services/uct
 
-COPY ./go.mod ./go.sum /go/services/utc/
+COPY ./go.mod ./go.sum /go/services/uct/
 RUN go mod download && \
     go mod tidy
 
@@ -22,7 +22,7 @@ FROM alpine:latest
 
 WORKDIR /approot
 
-COPY --from=build /go/services/utc/app ./
+COPY --from=build /go/services/uct/app ./
 
 RUN addgroup go && \
     adduser -D -G go go && \
