@@ -3,10 +3,11 @@ package main
 import (
 	"fmt"
 	"github.com/golang-jwt/jwt"
+	"os"
 	"time"
 )
 
-var jwtSecret = []byte("some-secret-key")
+var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 
 // GenerateJWT generates a JWT for testing purposes
 func GenerateJWT() (string, error) {
