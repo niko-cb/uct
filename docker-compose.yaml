@@ -11,9 +11,9 @@ services:
       - "8080:8080"
     command: air
     tty: true
-    working_dir: /go/services/invoice
+    working_dir: /go/services/uct
     volumes:
-      -  ./backend/:/go/services/invoice/
+      -  ./backend/:/go/services/uct/
     environment:
       - DB_USER=user
       - DB_PASS=user
