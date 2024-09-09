@@ -1,4 +1,4 @@
-USE `utc`;
+USE `uct`;
 
 -- Table to store companies
 CREATE TABLE IF NOT EXISTS companies (
