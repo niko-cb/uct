@@ -30,7 +30,7 @@ func (s *server) Run() {
 	cfg := s.getServerConfig()
 	s.routing()
 	s.CORS()
-	s.Auth()
+	s.Auth(cfg.JwtSecret)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
