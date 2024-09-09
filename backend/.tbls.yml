@@ -1,0 +1,6 @@
+# DSN (Database Source Name) to connect database
+dsn: mysql://user:user@localhost:3306/uct?parseTime=true
+
+# Path to generate document
+# Default is `dbdoc`
+docPath: doc/schema
